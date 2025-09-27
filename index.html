@@ -205,7 +205,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
         <a href="https://arxiv.org/abs/2508.18443" class="work-item" target="_blank">
           <div class="work-info">
             <h5>PneuGelSight: Soft Robotic Vision-Based Proprioception and Tactile Sensing</h5>
-            <p> A soft pneumatic manipulator equipped with embedded vision-based proprioception and tactile sensing via an internal camera. It also proposes a sim-to-real pipeline that models the sensor’s optical and dynamic properties, enabling zero-shot transfer from simulation to real-world deployment in soft robotics. :contentReference[oaicite:1]{index=1}</p>
+            <p> A soft pneumatic manipulator equipped with embedded vision-based proprioception and tactile sensing via an internal camera. </p>
             <span class="work-venue">IJRR, arXiv 2025</span>
           </div>
           <i class="fas fa-external-link-alt"></i>
@@ -213,7 +213,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
         <a href="https://arxiv.org/abs/2501.06263" class="work-item" target="_blank">
           <div class="work-info">
             <h5>GelBelt: A Vision-based Tactile Sensor for Continuous Sensing of Large Surfaces</h5>
-            <p>A novel tactile sensor using an elastomeric belt and two wheels that can continuously scan large surfaces with high accuracy; shows robust shape reconstruction at speeds up to ~45 mm/s. :contentReference[oaicite:1]{index=1}</p>
+            <p>A novel tactile sensor using an elastomeric belt and two wheels that can continuously scan large surfaces with high accuracy; shows robust shape reconstruction at speeds up to ~45 mm/s. </p>
             <span class="work-venue">IEEE RA-L, arXiv 2025</span>
           </div>
           <i class="fas fa-external-link-alt"></i>
@@ -221,7 +221,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
         <a href="https://arxiv.org/abs/2412.09617" class="work-item" target="_blank">
           <div class="work-info">
             <h5>NormalFlow: Fast, Robust, and Accurate Contact-based Object 6DoF Pose Tracking with Vision-based Tactile Sensors</h5>
-            <p>An algorithm for real-time 6-DoF pose tracking using vision-based tactile sensors via precise normal estimation; shows strong accuracy even on low-texture objects. Based on RA-L 2024.</p>
+            <p>An algorithm for real-time 6-DoF pose tracking using vision-based tactile sensors via precise normal estimation; shows strong accuracy even on low-texture objects.</p>
             <span class="work-venue">IEEE RA-L, arXiv 2024</span>
           </div>
           <i class="fas fa-external-link-alt"></i>
@@ -309,21 +309,18 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
 
 
 <!-- Teaser video-->
-<section class="hero teaser">
+<!-- <section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
-      <!-- TODO: Replace with your teaser video -->
       <video poster="" id="tree" autoplay controls muted loop height="100%" preload="metadata">
-        <!-- TODO: Add your video file path here -->
         <source src="static/videos/banner_video.mp4" type="video/mp4">
       </video>
-      <!-- TODO: Replace with your video description -->
       <h2 class="subtitle has-text-centered">
         Aliquam vitae elit ullamcorper tellus egestas pellentesque. Ut lacus tellus, maximus vel lectus at, placerat pretium mi. Maecenas dignissim tincidunt vestibulum. Sed consequat hendrerit nisl ut maximus. 
       </h2>
     </div>
   </div>
-</section>
+</section> -->
 <!-- End teaser video -->
 
 <!-- Paper abstract -->
@@ -335,7 +332,8 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
         <div class="content has-text-justified">
           <!-- TODO: Replace with your paper abstract -->
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ullamcorper tellus sed ante aliquam tempus. Etiam porttitor urna feugiat nibh elementum, et tempor dolor mattis. Donec accumsan enim augue, a vulputate nisi sodales sit amet. Proin bibendum ex eget mauris cursus euismod nec et nibh. Maecenas ac gravida ante, nec cursus dui. Vivamus purus nibh, placerat ac purus eget, sagittis vestibulum metus. Sed vestibulum bibendum lectus gravida commodo. Pellentesque auctor leo vitae sagittis suscipit.
+            The automation of fruit harvesting has gained increasing significance in response to rising labor shortages. A sensorized gripper is a key component of this process, which must be compact enough for confined spaces, able to stably grasp diverse fruits, and provide reliable feedback on fruit condition for efficient harvesting.
+To address this need, we propose FruitTouch, a compact gripper that integrates high-resolution, vision-based tactile sensing through an optimized optical design. This configuration accommodates a wide range of fruit sizes while maintaining low cost and mechanical simplicity. Tactile images captured by an embedded camera provide rich information for real-time force estimation, slip detection, and softness prediction. We validate the gripper in real-world cherry tomato harvesting experiments, demonstrating robust grasp stability, effective damage prevention, and adaptability to challenging agricultural conditions.
           </p>
         </div>
       </div>
@@ -352,33 +350,28 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
       <div id="results-carousel" class="carousel results-carousel">
        <div class="item">
         <!-- TODO: Replace with your research result images -->
-        <img src="static/images/carousel1.jpg" alt="First research result visualization" loading="lazy"/>
+        <img src="static/images/teaser.png" alt="First research result visualization" loading="lazy"/>
         <!-- TODO: Replace with description of this result -->
         <h2 class="subtitle has-text-centered">
-          First image description.
+          Demonstration of the FruitTouch gripper harvesting cherry tomatoes. The hardware design is optimized for compactness, low cost, and scalability, while the perception system measures high-resolution contact geometry, 3D force, slip, and object softness. Together, the design integrates mechanical efficiency with rich tactile sensing to enable reliable and efficient fruit harvesting. 
         </h2>
       </div>
       <div class="item">
         <!-- Your image here -->
-        <img src="static/images/carousel2.jpg" alt="Second research result visualization" loading="lazy"/>
+        <img src="static/images/design_2column.png" alt="Second research result visualization" loading="lazy"/>
         <h2 class="subtitle has-text-centered">
-          Second image description.
+          Mechanical and Optical Design of FruitTouch Gripper.
+        (A) Mechanical Design. The gripper components are designed for scalability, enabling harvesting of fruits with varying sizes. We use gear-and-rack mechanism to provide actuation. Each finger consists of a soft silicone sensing surface supported by a transparent acrylic sheet, with three LED strips ensuring uniform illumination. A centrally mounted camera, in combination with mirrors, provides comprehensive coverage of both sensing surfaces.
+        (B) Optical Design for the fingertip tactile sensors. The mirror configuration is optimized to maximize the sensing area while maintaining low distortion across different finger distances. Simulated outputs are shown for both the open and closed states of the gripper.
         </h2>
       </div>
       <div class="item">
         <!-- Your image here -->
-        <img src="static/images/carousel3.jpg" alt="Third research result visualization" loading="lazy"/>
+        <img src="static/images/harvest_system.png" alt="Third research result visualization" loading="lazy"/>
         <h2 class="subtitle has-text-centered">
-         Third image description.
+         Flow diagram of harvest experiment that includes berry detection, initial pose calculation, and picking phases. (A) Use the RGB-D camera to scan the area and identifying berries. \textbf{(B)} Align and move the manipulator to initial pose. (C) The gripper executes the picking action according to the chosen control strategy.
        </h2>
      </div>
-     <div class="item">
-      <!-- Your image here -->
-      <img src="static/images/carousel4.jpg" alt="Fourth research result visualization" loading="lazy"/>
-      <h2 class="subtitle has-text-centered">
-        Fourth image description.
-      </h2>
-    </div>
   </div>
 </div>
 </div>
@@ -389,57 +382,49 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
 
 
 <!-- Youtube video -->
-<section class="hero is-small is-light">
+<!-- <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
-      <!-- Paper video. -->
       <h2 class="title is-3">Video Presentation</h2>
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
           
           <div class="publication-video">
-            <!-- TODO: Replace with your YouTube video ID -->
             <iframe src="https://www.youtube.com/embed/JkaxUblCGz0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</section> -->
 <!-- End youtube video -->
 
 
 <!-- Video carousel -->
-<section class="hero is-small">
+<!-- <section class="hero is-small">
   <div class="hero-body">
     <div class="container">
       <h2 class="title is-3">Another Carousel</h2>
       <div id="results-carousel" class="carousel results-carousel">
         <div class="item item-video1">
-          <!-- TODO: Add poster image for better preview -->
           <video poster="" id="video1" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
             <source src="static/videos/carousel1.mp4" type="video/mp4">
           </video>
         </div>
         <div class="item item-video2">
-          <!-- TODO: Add poster image for better preview -->
           <video poster="" id="video2" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
             <source src="static/videos/carousel2.mp4" type="video/mp4">
           </video>
         </div>
         <div class="item item-video3">
-          <!-- TODO: Add poster image for better preview -->
           <video poster="" id="video3" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
             <source src="static/videos/carousel3.mp4" type="video/mp4">
           </video>
         </div>
       </div>
     </div>
   </div>
-</section>
+</section> -->
 <!-- End video carousel -->
 
 
@@ -454,7 +439,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
       <h2 class="title">Poster</h2>
 
       <!-- TODO: Replace with your poster PDF -->
-      <iframe  src="static/pdfs/sample.pdf" width="100%" height="550">
+      <iframe  src="static/pdfs/paper_preview.pdf" width="100%" height="550">
           </iframe>
         
       </div>
@@ -474,12 +459,12 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
           <span class="copy-text">Copy</span>
         </button>
       </div>
-      <pre id="bibtex-code"><code>@article{YourPaperKey2024,
-  title={Your Paper Title Here},
-  author={First Author and Second Author and Third Author},
-  journal={Conference/Journal Name},
-  year={2024},
-  url={https://your-domain.com/your-project-page}
+      <pre id="bibtex-code"><code>@article{FruitTouch2025,
+  title={FruitTouch: A Perceptive Gripper for Gentle and Scalable Fruit Harvesting},
+  author={Ruohan Zhang, Amin Mirzaee and Wenzhen Yuan},
+  journal={Under Review},
+  year={2025},
+  url={https://rhzhang-ustc.github.io/miniG-project}
 }</code></pre>
     </div>
 </section>
