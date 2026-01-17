@@ -25,6 +25,26 @@ function applyAnonymousMode() {
 
     document.title = 'FruitTouch | Anonymous for Review';
 
+    const titleMeta = document.querySelector('meta[name="title"]');
+    if (titleMeta) {
+        titleMeta.setAttribute('content', 'FruitTouch | Anonymous for Review');
+    }
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+        ogTitle.setAttribute('content', 'FruitTouch | Anonymous for Review');
+    }
+
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitle) {
+        twitterTitle.setAttribute('content', 'FruitTouch | Anonymous for Review');
+    }
+
+    const citationTitle = document.querySelector('meta[name="citation_title"]');
+    if (citationTitle) {
+        citationTitle.setAttribute('content', 'FruitTouch: A Perceptive Gripper for Gentle and Scalable Fruit Harvesting');
+    }
+
     const bibtexCode = document.getElementById('bibtex-code');
     if (bibtexCode) {
         bibtexCode.textContent = `@article{FruitTouch2025,
@@ -53,6 +73,21 @@ function applyAnonymousMode() {
     if (citationPdf) {
         citationPdf.setAttribute('content', 'static/pdfs/paper_rebuttal.pdf');
     }
+
+    document.querySelectorAll('script[type="application/ld+json"]').forEach((script) => {
+        try {
+            const data = JSON.parse(script.textContent);
+            if (data['@type'] === 'ScholarlyArticle') {
+                data.author = [{ '@type': 'Person', name: 'Anonymous' }];
+                data.publisher = { '@type': 'Organization', name: 'Under Review' };
+                data.url = window.location.origin + window.location.pathname;
+                data.citation = 'BIBTEX_CITATION_HERE';
+                script.textContent = JSON.stringify(data, null, 2);
+            }
+        } catch (error) {
+            console.warn('Failed to update anonymous JSON-LD metadata.', error);
+        }
+    });
 }
 
 // More Works Dropdown Functionality
