@@ -1,0 +1,18 @@
+newmtl red_apple_Mat
+Ni 1.6
+Ka 0 0 0
+map_Ke apple_ST8R5TY/red_apple_Mat_glow.png
+d 1
+Kd 0 0 0
+adobe_map_normal apple_ST8R5TY/red_apple_Mat_normal.png
+map_d apple_ST8R5TY/red_apple_Mat_opacity.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness apple_ST8R5TY/red_apple_Mat_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm apple_ST8R5TY/red_apple_Mat_metallic.png
+Ns 16
+map_Kd apple_ST8R5TY/red_apple_Mat_baseColor.png

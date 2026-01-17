@@ -103,12 +103,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Defer non-critical JavaScript -->
+  <script>
+    window.ANONYMOUS_MODE = true;
+  </script>
   <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
   <script defer src="static/js/fontawesome.all.min.js"></script>
   <script defer src="static/js/bulma-carousel.min.js"></script>
   <script defer src="static/js/bulma-slider.min.js"></script>
   <script defer src="static/js/index.js"></script>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
   
   <!-- Structured Data for Academic Papers -->
   <script type="application/ld+json">
@@ -187,7 +198,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
   </button>
 
   <!-- More Works Dropdown -->
-  <div class="more-works-container">
+  <div class="more-works-container" id="more-works-container">
     <button class="more-works-btn" onclick="toggleMoreWorks()" title="View More Works from Our Lab">
       <i class="fas fa-flask"></i>
       More Works
@@ -238,7 +249,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
           <div class="column has-text-centered">
             <!-- TODO: Replace with your paper title -->
             <h1 class="title is-1 publication-title">FruitTouch: A Perceptive Gripper for Gentle and Scalable Fruit Harvesting</h1>
-            <div class="is-size-5 publication-authors">
+            <div class="is-size-5 publication-authors" id="author-list">
               <!-- TODO: Replace with your paper authors and their personal links -->
               <span class="author-block">
                 <a href="https://rhzhang-ustc.github.io" target="_blank">Ruohan Zhang</a>,</span>
@@ -249,7 +260,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
                   </span>
                   </div>
 
-                  <div class="is-size-5 publication-authors">
+                  <div class="is-size-5 publication-authors" id="author-affiliation">
                     <!-- TODO: Replace with your institution and conference/journal info -->
                     <span class="author-block">University of Illinois, Urbana-Champaign<br>Under Review 2025</span>
                   </div>
@@ -342,6 +353,51 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
 </section>
 <!-- End paper abstract -->
 
+<!-- Interactive gripper viewer -->
+<section class="section hero is-light" id="gripper-explorer">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <h2 class="title is-3 has-text-centered">Interactive Gripper Explorer</h2>
+        <p class="has-text-centered gripper-subtitle">
+          Drag the slider to change gripper scale, then click a component to label it.
+        </p>
+        <div class="gripper-panel">
+          <div class="gripper-controls">
+            <label class="gripper-label-title" for="gripper-size">Gripper size</label>
+            <div class="gripper-slider-row">
+              <input id="gripper-size" class="gripper-slider" type="range" aria-label="Gripper size">
+              <span id="gripper-size-value" class="gripper-size-value">1.5x</span>
+            </div>
+            <div class="gripper-size-readout" id="gripper-size-readout">
+              <div>Sensing area: <span id="gripper-overall-size">--</span></div>
+              <div id="gripper-pad-dims">Y: -- mm, Z: -- mm</div>
+            </div>
+            <label class="gripper-label-title" for="gripper-openness">Gripper openness</label>
+            <div class="gripper-slider-row">
+              <input id="gripper-openness" class="gripper-slider" type="range" aria-label="Gripper openness">
+              <span id="gripper-openness-value" class="gripper-size-value">Open</span>
+            </div>
+            <p class="gripper-hint">Tip: drag to rotate, scroll to zoom, click to tag a part.</p>
+          </div>
+          <div class="gripper-viewer" id="gripper-viewer">
+            <div class="gripper-label" id="gripper-part-label" aria-hidden="true">
+              <span class="gripper-label-dot"></span>
+              <span id="gripper-part-name">Part</span>
+            </div>
+            <div class="gripper-axis-legend" aria-hidden="true">
+              <span class="axis-x">X</span>
+              <span class="axis-y">Y</span>
+              <span class="axis-z">Z</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End interactive gripper viewer -->
+
 
 <!-- Image carousel -->
 <section class="hero is-small">
@@ -369,7 +425,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
         <!-- Your image here -->
         <img src="static/images/harvest_system.png" alt="Third research result visualization" loading="lazy"/>
         <h2 class="subtitle has-text-centered">
-         Flow diagram of harvest experiment that includes berry detection, initial pose calculation, and picking phases. (A) Use the RGB-D camera to scan the area and identifying berries. \textbf{(B)} Align and move the manipulator to initial pose. (C) The gripper executes the picking action according to the chosen control strategy.
+         Flow diagram of harvest experiment that includes berry detection, initial pose calculation, and picking phases. (A) Use the RGB-D camera to scan the area and identifying berries. (B) Align and move the manipulator to initial pose. (C) The gripper executes the picking action according to the chosen control strategy.
        </h2>
      </div>
   </div>
@@ -439,7 +495,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
       <h2 class="title">Paper Preview</h2>
 
       <!-- TODO: Replace with your poster PDF -->
-      <iframe  src="static/pdfs/paper_preview.pdf" width="100%" height="550">
+      <iframe id="paper-frame" src="static/pdfs/paper_preview.pdf" width="100%" height="550">
           </iframe>
         
       </div>
@@ -495,5 +551,6 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
 
     <!-- End of Statcounter Code -->
 
+  <script type="module" src="static/js/gripper-viewer.js"></script>
   </body>
   </html>

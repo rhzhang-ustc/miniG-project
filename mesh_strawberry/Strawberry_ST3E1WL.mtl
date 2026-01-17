@@ -1,0 +1,18 @@
+newmtl Strawberry_MatSG
+Ni 1.6
+Ka 0 0 0
+map_Ke Strawberry_ST3E1WL/Strawberry_MatSG_glow.png
+d 1
+Kd 0 0 0
+adobe_map_normal Strawberry_ST3E1WL/Strawberry_MatSG_normal.png
+map_d Strawberry_ST3E1WL/Strawberry_MatSG_opacity.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness Strawberry_ST3E1WL/Strawberry_MatSG_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm Strawberry_ST3E1WL/Strawberry_MatSG_metallic.png
+Ns 16
+map_Kd Strawberry_ST3E1WL/Strawberry_MatSG_baseColor.png

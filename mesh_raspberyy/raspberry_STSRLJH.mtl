@@ -1,0 +1,54 @@
+newmtl raspberry_main_body_Mat
+Ni 1.6
+Ka 0 0 0
+map_Ke raspberry_STSRLJH/raspberry_main_body_glow.png
+d 1
+Kd 0 0 0
+adobe_map_normal raspberry_STSRLJH/raspberry_main_body_normal.png
+map_d raspberry_STSRLJH/raspberry_main_body_opacity.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness raspberry_STSRLJH/raspberry_main_body_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm raspberry_STSRLJH/raspberry_main_body_metallic.png
+Ns 16
+map_Kd raspberry_STSRLJH/raspberry_main_body_baseColor.png
+newmtl large_hair_Mat
+Ni 1.6
+Ka 0 0 0
+map_Ke raspberry_STSRLJH/large_hair_glow.png
+d 1
+Kd 0 0 0
+adobe_map_normal raspberry_STSRLJH/large_hair_normal.png
+map_d raspberry_STSRLJH/large_hair_opacity.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness raspberry_STSRLJH/large_hair_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm raspberry_STSRLJH/large_hair_metallic.png
+Ns 16
+map_Kd raspberry_STSRLJH/large_hair_baseColor.png
+newmtl small_hair_Mat
+Ni 1.6
+Ka 0 0 0
+map_Ke raspberry_STSRLJH/small_hair_glow.png
+d 1
+Kd 0 0 0
+adobe_map_normal raspberry_STSRLJH/small_hair_normal.png
+map_d raspberry_STSRLJH/small_hair_opacity.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness raspberry_STSRLJH/small_hair_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm raspberry_STSRLJH/small_hair_metallic.png
+Ns 16
+map_Kd raspberry_STSRLJH/small_hair_baseColor.png
