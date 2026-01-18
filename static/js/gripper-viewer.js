@@ -2,6 +2,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
 import { OBJLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/OBJLoader.js";
 
+THREE.Cache.enabled = true;
+
 const viewer = document.getElementById("gripper-viewer");
 const slider = document.getElementById("gripper-size");
 const sizeValue = document.getElementById("gripper-size-value");
@@ -123,6 +125,8 @@ const group = new THREE.Group();
 scene.add(group);
 const axesHelper = new THREE.AxesHelper(1);
 scene.add(axesHelper);
+
+const objLoader = new OBJLoader();
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -269,9 +273,8 @@ async function loadSize(size) {
   group.clear();
   componentObjects.clear();
 
-  const loader = new OBJLoader();
   const results = await Promise.all(
-    PARTS.map((part) => loadPart(loader, size, part, currentToken))
+    PARTS.map((part) => loadPart(objLoader, size, part, currentToken))
   );
 
   if (currentToken !== loadToken) return;
@@ -289,6 +292,8 @@ async function loadSize(size) {
   if (missing > 0) {
     console.warn(`Size ${size} missing ${missing} part(s).`);
   }
+
+  prefetchAdjacentSizes(size);
 }
 
 async function updatePadDimensions(size, token) {
@@ -328,6 +333,22 @@ function updateTactileImage(openness) {
   const step = TACTILE_STEPS[clampedIndex];
   tactileImage.src = `${TACTILE_RENDER_BASE}/render_${step}.png`;
   tactileImage.alt = `Gripper internal view at ${Math.round(openness * 100)}% open`;
+}
+
+function prefetchAdjacentSizes(size) {
+  const index = SIZES.indexOf(size);
+  if (index === -1) return;
+  const prev = SIZES[index - 1];
+  const next = SIZES[index + 1];
+  if (prev) prefetchSizeAssets(prev);
+  if (next) prefetchSizeAssets(next);
+}
+
+function prefetchSizeAssets(size) {
+  PARTS.forEach((part) => {
+    const url = `GripGen/output/${size}/objs/${part.file}.obj`;
+    fetch(url, { cache: "force-cache" }).catch(() => {});
+  });
 }
 
 function setPartVisibility(partFile, visible) {
