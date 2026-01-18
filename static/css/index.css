@@ -738,7 +738,7 @@ a:focus {
 
 .gripper-panel {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(0, 2.2fr);
+  grid-template-columns: minmax(280px, 1.2fr) minmax(0, 2.2fr) minmax(180px, 0.8fr);
   gap: 1.5rem;
   align-items: stretch;
 }
@@ -790,6 +790,94 @@ a:focus {
 .gripper-size-readout span {
   color: var(--text-primary);
   font-weight: 600;
+}
+
+.gripper-tactile {
+  margin-top: 0.75rem;
+}
+
+.gripper-tactile-image {
+  width: 100%;
+  margin-top: 0.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  display: block;
+}
+
+.gripper-components {
+  margin-top: 1rem;
+}
+
+.gripper-components-panel {
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  align-self: stretch;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.gripper-component-list {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.gripper-component-group {
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.gripper-component-group:first-child {
+  border-top: none;
+}
+
+.gripper-component-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.gripper-component-toggle {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--primary-color);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.gripper-component-toggle:hover {
+  color: var(--primary-hover);
+}
+
+.gripper-component-items {
+  display: grid;
+  gap: 0.35rem;
+  padding-left: 1.1rem;
+}
+
+.gripper-component-items.is-collapsed {
+  display: none;
+}
+
+.gripper-component-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.gripper-component-item input {
+  accent-color: var(--primary-color);
 }
 
 .gripper-viewer {

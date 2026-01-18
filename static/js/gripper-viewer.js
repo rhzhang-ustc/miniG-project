@@ -11,6 +11,8 @@ const opennessSlider = document.getElementById("gripper-openness");
 const opennessValue = document.getElementById("gripper-openness-value");
 const label = document.getElementById("gripper-part-label");
 const labelName = document.getElementById("gripper-part-name");
+const tactileImage = document.getElementById("gripper-tactile-image");
+const componentList = document.getElementById("gripper-component-list");
 
 if (
   !viewer ||
@@ -20,6 +22,8 @@ if (
   !padDimsReadout ||
   !opennessSlider ||
   !opennessValue ||
+  !tactileImage ||
+  !componentList ||
   !label ||
   !labelName
 ) {
@@ -41,22 +45,43 @@ const SIZES = [
 ];
 
 const PARTS = [
-  { file: "Prints_base", label: "Base", color: "#94a3b8" },
-  { file: "Prints_motor_mount", label: "Motor mount", color: "#64748b" },
-  { file: "Prints_motor_link", label: "Motor link", color: "#475569" },
-  { file: "Prints_fingerRack", label: "Finger rack (left)", color: "#1e293b" },
-  { file: "Prints_fingerRack.001", label: "Finger rack (right)", color: "#0f172a" },
-  { file: "Prints_gear", label: "Gear", color: "#f59e0b" },
-  { file: "Prints_camera_housing", label: "Camera housing", color: "#f97316" },
-  { file: "Prints_led_cap", label: "LED cap (left)", color: "#fb7185" },
-  { file: "Prints_led_cap.001", label: "LED cap (right)", color: "#f43f5e" },
-  { file: "Optical_shell_locked", label: "Optical shell (left)", color: "#38bdf8" },
-  { file: "Optical_shell_locked.001", label: "Optical shell (right)", color: "#0ea5e9" },
-  { file: "Optical_led", label: "Optical LED (left)", color: "#22c55e" },
-  { file: "Optical_led.001", label: "Optical LED (right)", color: "#16a34a" },
-  { file: "Optical_pad", label: "Optical pad (left)", color: "#14b8a6" },
-  { file: "Optical_pad.001", label: "Optical pad (right)", color: "#0d9488" },
+  { file: "Prints_base", label: "Base", color: "#cbd5e1" },
+  { file: "Prints_motor_mount", label: "Motor mount", color: "#b6c1d1" },
+  { file: "Prints_motor_link", label: "Motor link", color: "#a7b3c4" },
+  { file: "Prints_fingerRack", label: "Finger rack (left)", color: "#97a4b8" },
+  { file: "Prints_fingerRack.001", label: "Finger rack (right)", color: "#8795aa" },
+  { file: "Prints_gear", label: "Gear", color: "#76869c" },
+  { file: "Prints_camera_housing", label: "Camera housing", color: "#6b7c92" },
+  { file: "Prints_led_cap", label: "LED cap (left)", color: "#5f7188" },
+  { file: "Prints_led_cap.001", label: "LED cap (right)", color: "#55677f" },
+  { file: "Optical_shell_locked", label: "Optical shell (left)", color: "#8fa2b9" },
+  { file: "Optical_shell_locked.001", label: "Optical shell (right)", color: "#8094ac" },
+  { file: "Optical_led", label: "Optical LED (left)", color: "#22d3ee" },
+  { file: "Optical_led.001", label: "Optical LED (right)", color: "#0ea5e9" },
+  { file: "Optical_pad", label: "Optical pad (left)", color: "#aebfd1" },
+  { file: "Optical_pad.001", label: "Optical pad (right)", color: "#9fb1c4" },
 ];
+
+const componentVisibility = new Map(PARTS.map((part) => [part.file, true]));
+const componentObjects = new Map();
+const COMPONENT_GROUPS = {
+  "Left finger": [
+    "Prints_fingerRack",
+    "Prints_led_cap",
+    "Optical_shell_locked.001",
+    "Optical_led",
+    "Optical_pad",
+  ],
+  "Right finger": [
+    "Prints_fingerRack.001",
+    "Prints_led_cap.001",
+    "Optical_shell_locked",
+    "Optical_led.001",
+    "Optical_pad.001",
+  ],
+  Base: ["Prints_base", "Prints_motor_mount", "Prints_motor_link", "Prints_gear", "Prints_camera_housing"],
+};
+const groupExpanded = new Map(Object.keys(COMPONENT_GROUPS).map((name) => [name, false]));
 
 const LEFT_FINGER_PARTS = new Set([
   "Optical_led",
@@ -83,8 +108,8 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.minDistance = 0.5;
-controls.maxDistance = 20;
+controls.minDistance = 0.3;
+controls.maxDistance = 12;
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
@@ -109,6 +134,8 @@ let leftFinger = [];
 let rightFinger = [];
 let fingerOpenDistance = 0;
 const modelSize = new THREE.Vector3();
+const TACTILE_RENDER_BASE = "tactile_render/output";
+const TACTILE_STEPS = Array.from({ length: 10 }, (_, index) => (index + 1) * 4);
 
 function resizeRenderer() {
   const rect = viewer.getBoundingClientRect();
@@ -161,14 +188,21 @@ function loadPart(loader, size, part, token) {
           resolve(false);
           return;
         }
+        const isOpticalShell =
+          part.file === "Optical_shell_locked" || part.file === "Optical_shell_locked.001";
+        const isOpticalPad = part.file === "Optical_pad" || part.file === "Optical_pad.001";
         const material = new THREE.MeshStandardMaterial({
           color: part.color,
-          roughness: 0.45,
-          metalness: 0.05,
+          roughness: isOpticalShell ? 0.2 : isOpticalPad ? 0.25 : 0.45,
+          metalness: isOpticalPad ? 0.7 : 0.05,
+          transparent: isOpticalShell,
+          opacity: isOpticalShell ? 0.45 : 1,
         });
         obj.userData.label = part.label;
         obj.userData.partFile = part.file;
         applyMaterial(obj, material, part.label);
+        componentObjects.set(part.file, obj);
+        obj.visible = componentVisibility.get(part.file) !== false;
         group.add(obj);
         resolve(true);
       },
@@ -191,7 +225,7 @@ function frameObject() {
   group.position.sub(center);
 
   const maxDim = Math.max(size.x, size.y, size.z);
-  const distance = maxDim * 2.2;
+  const distance = maxDim * 1.4;
   camera.position.set(distance, distance, distance);
   controls.target.set(0, 0, 0);
   controls.update();
@@ -233,6 +267,7 @@ async function loadSize(size) {
   const currentToken = ++loadToken;
   resetLabel();
   group.clear();
+  componentObjects.clear();
 
   const loader = new OBJLoader();
   const results = await Promise.all(
@@ -287,6 +322,94 @@ function parsePadDimensions(text) {
   return { x: match[1], y: match[2], z: match[3] };
 }
 
+function updateTactileImage(openness) {
+  const stepIndex = Math.round(openness * (TACTILE_STEPS.length - 1));
+  const clampedIndex = Math.min(Math.max(stepIndex, 0), TACTILE_STEPS.length - 1);
+  const step = TACTILE_STEPS[clampedIndex];
+  tactileImage.src = `${TACTILE_RENDER_BASE}/render_${step}.png`;
+  tactileImage.alt = `Gripper internal view at ${Math.round(openness * 100)}% open`;
+}
+
+function setPartVisibility(partFile, visible) {
+  componentVisibility.set(partFile, visible);
+  const obj = componentObjects.get(partFile);
+  if (obj) {
+    obj.visible = visible;
+  }
+}
+
+function buildComponentList() {
+  componentList.innerHTML = "";
+  Object.entries(COMPONENT_GROUPS).forEach(([groupName, partFiles]) => {
+    const groupWrapper = document.createElement("div");
+    groupWrapper.className = "gripper-component-group";
+
+    const header = document.createElement("label");
+    header.className = "gripper-component-group-header";
+
+    const title = document.createElement("span");
+    title.textContent = groupName;
+
+    const toggleButton = document.createElement("button");
+    toggleButton.type = "button";
+    toggleButton.className = "gripper-component-toggle";
+    const isExpanded = groupExpanded.get(groupName) === true;
+    toggleButton.setAttribute("aria-expanded", String(isExpanded));
+    toggleButton.textContent = isExpanded ? "Hide" : "Show";
+
+    const groupCheckbox = document.createElement("input");
+    groupCheckbox.type = "checkbox";
+    const allChecked = partFiles.every((file) => componentVisibility.get(file) !== false);
+    const anyChecked = partFiles.some((file) => componentVisibility.get(file) !== false);
+    groupCheckbox.checked = allChecked;
+    groupCheckbox.indeterminate = !allChecked && anyChecked;
+    groupCheckbox.addEventListener("change", () => {
+      partFiles.forEach((file) => setPartVisibility(file, groupCheckbox.checked));
+      buildComponentList();
+    });
+
+    header.appendChild(groupCheckbox);
+    header.appendChild(title);
+    header.appendChild(toggleButton);
+    groupWrapper.appendChild(header);
+
+    const items = document.createElement("div");
+    items.className = `gripper-component-items${isExpanded ? "" : " is-collapsed"}`;
+    toggleButton.addEventListener("click", () => {
+      const isHidden = items.classList.toggle("is-collapsed");
+      toggleButton.textContent = isHidden ? "Show" : "Hide";
+      toggleButton.setAttribute("aria-expanded", String(!isHidden));
+      groupExpanded.set(groupName, !isHidden);
+    });
+
+    partFiles.forEach((file) => {
+      const part = PARTS.find((entry) => entry.file === file);
+      if (!part) return;
+
+      const item = document.createElement("label");
+      item.className = "gripper-component-item";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = componentVisibility.get(part.file) !== false;
+      checkbox.addEventListener("change", () => {
+        setPartVisibility(part.file, checkbox.checked);
+        buildComponentList();
+      });
+
+      const name = document.createElement("span");
+      name.textContent = part.label;
+
+      item.appendChild(checkbox);
+      item.appendChild(name);
+      items.appendChild(item);
+    });
+
+    groupWrapper.appendChild(items);
+    componentList.appendChild(groupWrapper);
+  });
+}
+
 function applyOpenness(openness) {
   const perFingerOffset = fingerOpenDistance * 0.5 * openness;
   group.children.forEach((child) => {
@@ -308,6 +431,7 @@ function applyOpenness(openness) {
 
   const labelText = openness >= 0.95 ? "Open" : openness <= 0.05 ? "Closed" : "Partial";
   opennessValue.textContent = labelText;
+  updateTactileImage(openness);
 }
 
 function setSizeByIndex(index) {
@@ -337,7 +461,10 @@ renderer.domElement.addEventListener("pointerdown", (event) => {
   raycaster.setFromCamera(pointer, camera);
 
   const hits = raycaster.intersectObjects(group.children, true);
-  if (!hits.length) return;
+  if (!hits.length) {
+    resetLabel();
+    return;
+  }
 
   const hit = hits[0];
   const labelText = findLabelForObject(hit.object);
@@ -373,6 +500,7 @@ opennessSlider.step = "1";
 opennessSlider.value = "0";
 
 resizeRenderer();
+buildComponentList();
 setSizeByIndex(SIZES.indexOf("1.5"));
 applyOpenness(0);
 animate();

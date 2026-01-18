@@ -378,6 +378,10 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
               <input id="gripper-openness" class="gripper-slider" type="range" aria-label="Gripper openness">
               <span id="gripper-openness-value" class="gripper-size-value">Open</span>
             </div>
+            <div class="gripper-tactile">
+              <div class="gripper-label-title">Internal view</div>
+              <img id="gripper-tactile-image" class="gripper-tactile-image" alt="Gripper internal view" loading="lazy">
+            </div>
             <p class="gripper-hint">Tip: drag to rotate, scroll to zoom, click to tag a part.</p>
           </div>
           <div class="gripper-viewer" id="gripper-viewer">
@@ -390,6 +394,10 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
               <span class="axis-y">Y</span>
               <span class="axis-z">Z</span>
             </div>
+          </div>
+          <div class="gripper-components gripper-components-panel">
+            <div class="gripper-label-title">Components</div>
+            <div id="gripper-component-list" class="gripper-component-list"></div>
           </div>
         </div>
       </div>
