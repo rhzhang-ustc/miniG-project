@@ -105,6 +105,34 @@
   <!-- Defer non-critical JavaScript -->
   <script>
     window.ANONYMOUS_MODE = true;
+    if (window.ANONYMOUS_MODE) {
+      document.documentElement.classList.add('anonymous-mode');
+      document.title = 'Anonymous Project';
+      const titleMeta = document.querySelector('meta[name="title"]');
+      if (titleMeta) {
+        titleMeta.setAttribute('content', 'Anonymous Project');
+      }
+      const descriptionMeta = document.querySelector('meta[name="description"]');
+      if (descriptionMeta) {
+        descriptionMeta.setAttribute('content', 'Anonymous project page.');
+      }
+      const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+      if (ogTitleMeta) {
+        ogTitleMeta.setAttribute('content', 'Anonymous Project');
+      }
+      const ogDescriptionMeta = document.querySelector('meta[property="og:description"]');
+      if (ogDescriptionMeta) {
+        ogDescriptionMeta.setAttribute('content', 'Anonymous project page.');
+      }
+      const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
+      if (twitterTitleMeta) {
+        twitterTitleMeta.setAttribute('content', 'Anonymous Project');
+      }
+      const twitterDescriptionMeta = document.querySelector('meta[name="twitter:description"]');
+      if (twitterDescriptionMeta) {
+        twitterDescriptionMeta.setAttribute('content', 'Anonymous project page.');
+      }
+    }
   </script>
   <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
@@ -515,7 +543,7 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
 
 
 <!-- Paper poster -->
-<section class="hero is-small is-light">
+<section class="hero is-small is-light" id="paper-preview">
   <div class="hero-body">
     <div class="container">
       <h2 class="title">Paper Preview</h2>

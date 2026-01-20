@@ -101,6 +101,27 @@ body {
   color: var(--text-secondary);
 }
 
+.anonymous-mode #author-list,
+.anonymous-mode #author-affiliation,
+.anonymous-mode #more-works-container {
+  opacity: 0;
+}
+
+.anonymous-mode.anonymous-ready #author-list,
+.anonymous-mode.anonymous-ready #author-affiliation,
+.anonymous-mode.anonymous-ready #more-works-container {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.anonymous-mode #more-works-container {
+  display: none;
+}
+
+.anonymous-mode .footer a {
+  display: none;
+}
+
 .download-modal .modal-card {
   max-width: 640px;
   width: calc(100% - 2rem);

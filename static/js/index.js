@@ -30,14 +30,29 @@ function applyAnonymousMode() {
         titleMeta.setAttribute('content', 'FruitTouch | Anonymous for Review');
     }
 
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    if (descriptionMeta) {
+        descriptionMeta.setAttribute('content', 'Anonymous project page.');
+    }
+
     const ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) {
         ogTitle.setAttribute('content', 'FruitTouch | Anonymous for Review');
     }
 
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription) {
+        ogDescription.setAttribute('content', 'Anonymous project page.');
+    }
+
     const twitterTitle = document.querySelector('meta[name="twitter:title"]');
     if (twitterTitle) {
         twitterTitle.setAttribute('content', 'FruitTouch | Anonymous for Review');
+    }
+
+    const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDescription) {
+        twitterDescription.setAttribute('content', 'Anonymous project page.');
     }
 
     const citationTitle = document.querySelector('meta[name="citation_title"]');
@@ -88,6 +103,8 @@ function applyAnonymousMode() {
             console.warn('Failed to update anonymous JSON-LD metadata.', error);
         }
     });
+
+    document.documentElement.classList.add('anonymous-ready');
 }
 
 function openModal(modalId) {
