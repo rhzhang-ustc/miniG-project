@@ -310,6 +310,24 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
                   <span>arXiv</span> -->
                 </a>
               </span>
+              <span class="link-block">
+                <a href="#" class="external-link button is-normal is-rounded is-dark js-download-trigger" data-modal="gripgen-modal">
+                  <span class="icon">
+                    <i class="fas fa-download"></i>
+                  </span>
+                  <span>GripGen Script</span>
+                </a>
+                <p class="link-caption">Generate grippers with different sizes.</p>
+              </span>
+              <span class="link-block">
+                <a href="#" class="external-link button is-normal is-rounded is-dark js-download-trigger" data-modal="tactile-modal">
+                  <span class="icon">
+                    <i class="fas fa-download"></i>
+                  </span>
+                  <span>Tactile Render Script</span>
+                </a>
+                <p class="link-caption">Render internal tactile observations.</p>
+              </span>
             </div>
           </div>
         </div>
@@ -533,6 +551,76 @@ To address this need, we propose FruitTouch, a compact gripper that integrates h
     </div>
 </section>
 <!--End BibTex citation -->
+
+  <div class="modal download-modal" id="gripgen-modal">
+    <div class="modal-background" data-modal-close></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">GripGen Contents</p>
+        <button class="delete" aria-label="close" data-modal-close></button>
+      </header>
+      <section class="modal-card-body">
+        <p class="modal-description">Generate grippers with different sizes. Download files individually or grab the full folder.</p>
+        <ul class="file-list">
+          <li>
+            <span class="file-name">script.py</span>
+            <a href="GripGen/script.py" class="file-download" download>Download</a>
+          </li>
+          <li>
+            <span class="file-name">loop.py</span>
+            <a href="GripGen/loop.py" class="file-download" download>Download</a>
+          </li>
+          <li>
+            <span class="file-name">comps.blend</span>
+            <a href="GripGen/comps.blend" class="file-download" download>Download</a>
+          </li>
+          <li class="file-folder">
+            <span class="file-name">output/</span>
+            <span class="file-note">Generated meshes and blends (included in full download)</span>
+          </li>
+        </ul>
+      </section>
+      <footer class="modal-card-foot">
+        <a href="GripGen.zip" class="button is-dark is-rounded" download>Download Full Folder</a>
+        <button class="button is-light" data-modal-close>Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <div class="modal download-modal" id="tactile-modal">
+    <div class="modal-background" data-modal-close></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Tactile Render Contents</p>
+        <button class="delete" aria-label="close" data-modal-close></button>
+      </header>
+      <section class="modal-card-body">
+        <p class="modal-description">Render internal tactile observations. Download files individually or grab the full folder.</p>
+        <ul class="file-list">
+          <li>
+            <span class="file-name">render_loop.py</span>
+            <a href="tactile_render/render_loop.py" class="file-download" download>Download</a>
+          </li>
+          <li>
+            <span class="file-name">scene_render.blend</span>
+            <a href="tactile_render/scene_render.blend" class="file-download" download>Download</a>
+          </li>
+          <li>
+            <span class="file-name">scene_render.blend1</span>
+            <a href="tactile_render/scene_render.blend1" class="file-download" download>Download</a>
+          </li>
+          <li class="file-folder">
+            <span class="file-name">output/</span>
+            <span class="file-note">Rendered images (included in full download)</span>
+          </li>
+        </ul>
+      </section>
+      <footer class="modal-card-foot">
+        <a href="tactile_render.zip" class="button is-dark is-rounded" download>Download Full Folder</a>
+        <button class="button is-light" data-modal-close>Close</button>
+      </footer>
+    </div>
+  </div>
 
 
   <footer class="footer">

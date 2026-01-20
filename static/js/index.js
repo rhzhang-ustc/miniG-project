@@ -90,6 +90,34 @@ function applyAnonymousMode() {
     });
 }
 
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('is-active');
+    }
+}
+
+function closeModal(modal) {
+    if (modal) {
+        modal.classList.remove('is-active');
+    }
+}
+
+document.addEventListener('click', function(event) {
+    const trigger = event.target.closest('.js-download-trigger');
+    if (trigger) {
+        event.preventDefault();
+        openModal(trigger.dataset.modal);
+        return;
+    }
+
+    const closeTarget = event.target.closest('[data-modal-close]');
+    if (closeTarget) {
+        const modal = closeTarget.closest('.modal');
+        closeModal(modal);
+    }
+});
+
 // More Works Dropdown Functionality
 function toggleMoreWorks() {
     const dropdown = document.getElementById('moreWorksDropdown');
@@ -123,6 +151,9 @@ document.addEventListener('keydown', function(event) {
         const button = document.querySelector('.more-works-btn');
         dropdown.classList.remove('show');
         button.classList.remove('active');
+        document.querySelectorAll('.modal.is-active').forEach((modal) => {
+            closeModal(modal);
+        });
     }
 });
 
