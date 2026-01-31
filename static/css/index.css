@@ -969,6 +969,39 @@ a:focus {
   accent-color: var(--primary-color);
 }
 
+/* Fruit reference section styling */
+.gripper-fruit-section {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: var(--border-radius);
+  padding: 0.6rem !important;
+  margin-bottom: 0.5rem;
+  border: 1px solid #fcd34d !important;
+}
+
+.gripper-fruit-header {
+  margin-bottom: 0.4rem;
+}
+
+.gripper-fruit-items {
+  padding-left: 0 !important;
+  gap: 0.3rem !important;
+}
+
+.gripper-fruit-section .gripper-component-item {
+  background: rgba(255, 255, 255, 0.6);
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.gripper-fruit-section .gripper-component-item:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.gripper-fruit-section small {
+  font-size: 0.75rem;
+}
+
 .gripper-viewer {
   position: relative;
   min-height: 420px;

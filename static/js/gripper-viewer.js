@@ -1,6 +1,7 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
 import { OBJLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/OBJLoader.js";
+import { MTLLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/MTLLoader.js";
 
 THREE.Cache.enabled = true;
 
@@ -83,6 +84,13 @@ const COMPONENT_GROUPS = {
   ],
   Base: ["Prints_base", "Prints_motor_mount", "Prints_motor_link", "Prints_gear", "Prints_camera_housing"],
 };
+
+// Track fruit visibility state (user toggle overrides auto-visibility)
+let fruitUserOverride = {
+  strawberry: null, // null = auto, true/false = user override
+  apple: null,
+};
+let currentGripperSize = "1.5";
 const groupExpanded = new Map(Object.keys(COMPONENT_GROUPS).map((name) => [name, false]));
 
 const LEFT_FINGER_PARTS = new Set([
@@ -127,6 +135,40 @@ const axesHelper = new THREE.AxesHelper(1);
 scene.add(axesHelper);
 
 const objLoader = new OBJLoader();
+const mtlLoader = new MTLLoader();
+
+// Reference fruit objects for scale visualization
+let strawberryObject = null;
+let appleObject = null;
+let fruitsLoaded = false;
+
+// Fruit configuration - scale to match gel pad sizes
+// Smallest gel pad (1.0x): Y=27mm, Z=31mm
+// Largest gel pad (2.0x): Y=54mm, Z=62mm
+const FRUIT_CONFIG = {
+  strawberry: {
+    objPath: "mesh_strawberry/Strawberry_ST3E1WL.obj",
+    mtlPath: "mesh_strawberry/Strawberry_ST3E1WL.mtl",
+    texturePath: "mesh_strawberry/Strawberry_ST3E1WL/Strawberry_MatSG_baseColor.png",
+    scale: 0.005, // Scale to match smallest gel pad (~30mm)
+    targetSize: "1.0", // Visible with smallest gripper
+    label: "Strawberry (reference)",
+    yOffset: 0.025,
+    fallbackColor: 0xe63946, // Bright red
+  },
+  apple: {
+    objPath: "mesh_apple/apple_ST8R5TY.obj",
+    mtlPath: "mesh_apple/apple_ST8R5TY.mtl",
+    texturePath: "mesh_apple/apple_ST8R5TY/red_apple_Mat_baseColor.png",
+    scale: 0.01, // Scale to match largest gel pad (~55mm)
+    targetSize: "2.0", // Visible with largest gripper
+    label: "Apple (reference)",
+    yOffset: 0.04,
+    fallbackColor: 0xc1121f, // Deep apple red
+  },
+};
+
+const textureLoader = new THREE.TextureLoader();
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -288,6 +330,10 @@ async function loadSize(size) {
   applyOpenness(Number(opennessSlider.value) / 100);
   await updatePadDimensions(size, currentToken);
 
+  // Update fruit visibility based on current size
+  updateFruitVisibility(size);
+  positionFruits();
+
   const missing = results.filter((loaded) => !loaded).length;
   if (missing > 0) {
     console.warn(`Size ${size} missing ${missing} part(s).`);
@@ -351,6 +397,234 @@ function prefetchSizeAssets(size) {
   });
 }
 
+async function loadFruitModel(config) {
+  return new Promise((resolve) => {
+    // Try to load with texture directly for best results
+    const loader = new OBJLoader();
+    
+    loader.load(
+      config.objPath,
+      (obj) => {
+        obj.scale.setScalar(config.scale);
+        obj.userData.label = config.label;
+        obj.userData.isFruit = true;
+        
+        // Try to load the base color texture
+        textureLoader.load(
+          config.texturePath,
+          (texture) => {
+            // Texture loaded successfully
+            texture.colorSpace = THREE.SRGBColorSpace;
+            const material = new THREE.MeshStandardMaterial({
+              map: texture,
+              roughness: 0.5,
+              metalness: 0.05,
+            });
+            obj.traverse((child) => {
+              if (child.isMesh) {
+                child.material = material;
+                child.userData.label = config.label;
+              }
+            });
+            resolve(obj);
+          },
+          undefined,
+          () => {
+            // Texture failed, apply fallback colors
+            applyFallbackColors(obj, config);
+            resolve(obj);
+          }
+        );
+      },
+      undefined,
+      () => resolve(null)
+    );
+  });
+}
+
+function applyFallbackColors(obj, config) {
+  if (config === FRUIT_CONFIG.strawberry) {
+    // Strawberry: red body with green leaves at top
+    const strawberryBodyMaterial = new THREE.MeshStandardMaterial({
+      color: 0xe63946, // Bright strawberry red
+      roughness: 0.5,
+      metalness: 0.05,
+    });
+    const strawberryLeavesMaterial = new THREE.MeshStandardMaterial({
+      color: 0x2d6a4f, // Forest green for leaves
+      roughness: 0.6,
+      metalness: 0.0,
+    });
+    
+    // Find the overall bounding box to determine leaf threshold
+    let globalMaxY = -Infinity;
+    let globalMinY = Infinity;
+    obj.traverse((child) => {
+      if (child.isMesh && child.geometry && child.geometry.attributes.position) {
+        const positions = child.geometry.attributes.position;
+        for (let i = 0; i < positions.count; i++) {
+          const y = positions.getY(i);
+          globalMaxY = Math.max(globalMaxY, y);
+          globalMinY = Math.min(globalMinY, y);
+        }
+      }
+    });
+    
+    const height = globalMaxY - globalMinY;
+    const leafThreshold = globalMinY + height * 0.78; // Top ~22% is leaves/calyx
+    
+    obj.traverse((child) => {
+      if (child.isMesh) {
+        child.userData.label = config.label;
+        const geometry = child.geometry;
+        
+        if (geometry && geometry.attributes && geometry.attributes.position) {
+          const positions = geometry.attributes.position;
+          
+          // Calculate how many vertices are in the "leaf" region
+          let leafVertices = 0;
+          for (let i = 0; i < positions.count; i++) {
+            if (positions.getY(i) > leafThreshold) {
+              leafVertices++;
+            }
+          }
+          
+          // If more than 30% of vertices are in leaf region, it's likely leaves
+          if (leafVertices / positions.count > 0.3) {
+            child.material = strawberryLeavesMaterial;
+          } else {
+            child.material = strawberryBodyMaterial;
+          }
+        } else {
+          child.material = strawberryBodyMaterial;
+        }
+      }
+    });
+  } else if (config === FRUIT_CONFIG.apple) {
+    // Apple: red body with brown stem
+    const appleBodyMaterial = new THREE.MeshStandardMaterial({
+      color: 0xc1121f, // Deep apple red
+      roughness: 0.3,
+      metalness: 0.1,
+    });
+    const appleStemMaterial = new THREE.MeshStandardMaterial({
+      color: 0x5c4033, // Brown stem
+      roughness: 0.8,
+      metalness: 0.0,
+    });
+    
+    // Find global bounds
+    let globalMaxY = -Infinity;
+    obj.traverse((child) => {
+      if (child.isMesh && child.geometry && child.geometry.attributes.position) {
+        const positions = child.geometry.attributes.position;
+        for (let i = 0; i < positions.count; i++) {
+          globalMaxY = Math.max(globalMaxY, positions.getY(i));
+        }
+      }
+    });
+    
+    obj.traverse((child) => {
+      if (child.isMesh) {
+        child.userData.label = config.label;
+        const geometry = child.geometry;
+        
+        if (geometry && geometry.attributes && geometry.attributes.position) {
+          const positions = geometry.attributes.position;
+          
+          // Check if this is a small mesh at the very top (stem)
+          let avgY = 0;
+          let minLocalY = Infinity;
+          for (let i = 0; i < positions.count; i++) {
+            avgY += positions.getY(i);
+            minLocalY = Math.min(minLocalY, positions.getY(i));
+          }
+          avgY /= positions.count;
+          
+          // Stem: small mesh, mostly at top, thin
+          if (positions.count < 1000 && minLocalY > globalMaxY * 0.85) {
+            child.material = appleStemMaterial;
+          } else {
+            child.material = appleBodyMaterial;
+          }
+        } else {
+          child.material = appleBodyMaterial;
+        }
+      }
+    });
+  }
+}
+
+async function loadFruits() {
+  if (fruitsLoaded) return;
+
+  const [strawberry, apple] = await Promise.all([
+    loadFruitModel(FRUIT_CONFIG.strawberry),
+    loadFruitModel(FRUIT_CONFIG.apple),
+  ]);
+
+  if (strawberry) {
+    strawberryObject = strawberry;
+    strawberryObject.visible = false;
+    scene.add(strawberryObject);
+  }
+
+  if (apple) {
+    appleObject = apple;
+    appleObject.visible = false;
+    scene.add(appleObject);
+  }
+
+  fruitsLoaded = true;
+}
+
+function updateFruitVisibility(size) {
+  currentGripperSize = size;
+  if (!fruitsLoaded) return;
+
+  // Check user override, otherwise use auto-visibility based on size
+  if (strawberryObject) {
+    const autoVisible = size === FRUIT_CONFIG.strawberry.targetSize;
+    strawberryObject.visible = fruitUserOverride.strawberry !== null 
+      ? fruitUserOverride.strawberry 
+      : autoVisible;
+  }
+  if (appleObject) {
+    const autoVisible = size === FRUIT_CONFIG.apple.targetSize;
+    appleObject.visible = fruitUserOverride.apple !== null 
+      ? fruitUserOverride.apple 
+      : autoVisible;
+  }
+
+  // Update component list checkboxes
+  updateFruitCheckboxes();
+}
+
+function updateFruitCheckboxes() {
+  const strawberryCheckbox = document.getElementById("fruit-strawberry-checkbox");
+  const appleCheckbox = document.getElementById("fruit-apple-checkbox");
+  
+  if (strawberryCheckbox && strawberryObject) {
+    strawberryCheckbox.checked = strawberryObject.visible;
+  }
+  if (appleCheckbox && appleObject) {
+    appleCheckbox.checked = appleObject.visible;
+  }
+}
+
+function positionFruits() {
+  if (!fruitsLoaded) return;
+
+  // Position fruit in the center of the gripper grasp area
+  // The gripper is centered at origin after framing
+  if (strawberryObject) {
+    strawberryObject.position.set(0, FRUIT_CONFIG.strawberry.yOffset, 0);
+  }
+  if (appleObject) {
+    appleObject.position.set(0, FRUIT_CONFIG.apple.yOffset, 0);
+  }
+}
+
 function setPartVisibility(partFile, visible) {
   componentVisibility.set(partFile, visible);
   const obj = componentObjects.get(partFile);
@@ -361,6 +635,75 @@ function setPartVisibility(partFile, visible) {
 
 function buildComponentList() {
   componentList.innerHTML = "";
+  
+  // Add fruit reference section first
+  const fruitSection = document.createElement("div");
+  fruitSection.className = "gripper-component-group gripper-fruit-section";
+  
+  const fruitHeader = document.createElement("div");
+  fruitHeader.className = "gripper-component-group-header gripper-fruit-header";
+  
+  const fruitTitle = document.createElement("span");
+  fruitTitle.textContent = "Size Reference";
+  fruitTitle.style.fontWeight = "600";
+  fruitHeader.appendChild(fruitTitle);
+  fruitSection.appendChild(fruitHeader);
+  
+  const fruitItems = document.createElement("div");
+  fruitItems.className = "gripper-component-items gripper-fruit-items";
+  
+  // Strawberry toggle
+  const strawberryItem = document.createElement("label");
+  strawberryItem.className = "gripper-component-item";
+  const strawberryCheckbox = document.createElement("input");
+  strawberryCheckbox.type = "checkbox";
+  strawberryCheckbox.id = "fruit-strawberry-checkbox";
+  strawberryCheckbox.checked = strawberryObject ? strawberryObject.visible : false;
+  strawberryCheckbox.addEventListener("change", () => {
+    fruitUserOverride.strawberry = strawberryCheckbox.checked;
+    if (strawberryObject) strawberryObject.visible = strawberryCheckbox.checked;
+    // If showing strawberry, hide apple (only one fruit at a time)
+    if (strawberryCheckbox.checked && appleObject) {
+      appleObject.visible = false;
+      fruitUserOverride.apple = false;
+      const appleChk = document.getElementById("fruit-apple-checkbox");
+      if (appleChk) appleChk.checked = false;
+    }
+  });
+  const strawberryLabel = document.createElement("span");
+  strawberryLabel.innerHTML = "Strawberry <small style='opacity:0.7'>(for 1.0x)</small>";
+  strawberryItem.appendChild(strawberryCheckbox);
+  strawberryItem.appendChild(strawberryLabel);
+  fruitItems.appendChild(strawberryItem);
+  
+  // Apple toggle
+  const appleItem = document.createElement("label");
+  appleItem.className = "gripper-component-item";
+  const appleCheckbox = document.createElement("input");
+  appleCheckbox.type = "checkbox";
+  appleCheckbox.id = "fruit-apple-checkbox";
+  appleCheckbox.checked = appleObject ? appleObject.visible : false;
+  appleCheckbox.addEventListener("change", () => {
+    fruitUserOverride.apple = appleCheckbox.checked;
+    if (appleObject) appleObject.visible = appleCheckbox.checked;
+    // If showing apple, hide strawberry (only one fruit at a time)
+    if (appleCheckbox.checked && strawberryObject) {
+      strawberryObject.visible = false;
+      fruitUserOverride.strawberry = false;
+      const strawberryChk = document.getElementById("fruit-strawberry-checkbox");
+      if (strawberryChk) strawberryChk.checked = false;
+    }
+  });
+  const appleLabel = document.createElement("span");
+  appleLabel.innerHTML = "Apple <small style='opacity:0.7'>(for 2.0x)</small>";
+  appleItem.appendChild(appleCheckbox);
+  appleItem.appendChild(appleLabel);
+  fruitItems.appendChild(appleItem);
+  
+  fruitSection.appendChild(fruitItems);
+  componentList.appendChild(fruitSection);
+  
+  // Add gripper component groups
   Object.entries(COMPONENT_GROUPS).forEach(([groupName, partFiles]) => {
     const groupWrapper = document.createElement("div");
     groupWrapper.className = "gripper-component-group";
@@ -481,7 +824,12 @@ renderer.domElement.addEventListener("pointerdown", (event) => {
   pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
 
-  const hits = raycaster.intersectObjects(group.children, true);
+  // Include both gripper parts and fruit objects
+  const objectsToCheck = [...group.children];
+  if (strawberryObject && strawberryObject.visible) objectsToCheck.push(strawberryObject);
+  if (appleObject && appleObject.visible) objectsToCheck.push(appleObject);
+
+  const hits = raycaster.intersectObjects(objectsToCheck, true);
   if (!hits.length) {
     resetLabel();
     return;
@@ -522,6 +870,7 @@ opennessSlider.value = "0";
 
 resizeRenderer();
 buildComponentList();
+loadFruits(); // Load fruit reference objects
 setSizeByIndex(SIZES.indexOf("1.5"));
 applyOpenness(0);
 animate();
