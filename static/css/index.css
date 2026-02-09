@@ -1087,6 +1087,16 @@ a:focus {
 }
 
 
+/* Physical Hardware Section Styling */
+.hardware-image-container {
+  transition: var(--transition);
+}
+
+.hardware-image-container:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg) !important;
+}
+
 /* Print styles */
 @media print {
   .more-works-container {
